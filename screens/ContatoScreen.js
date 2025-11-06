@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import CustomInput from '../components/CustomInput'; // Importação do novo componente!
 
 // Função de validação de e-mail (Regex)
 const validateEmail = (email) => {
@@ -47,20 +48,19 @@ export default function ContatoScreen({ navigation }) {
 
             // Versão para GARANTIR o sucesso e testar a navegação
             const success = true; 
-            
-            // Se quiser testar o erro, mude para: const success = Math.random() < 0.8;
+            // Para retornar ao 80% de sucesso, altere para: const success = Math.random() < 0.8;
 
             if (success) {
                 // SOLUÇÃO PARA O WEB: Alert simples e navegação/limpeza forçada
                 Alert.alert("Feedback Enviado!", `Obrigado, ${nome}! O seu pedido foi registrado.`);
-                
+
                 // Limpeza de estado
                 setNome('');
                 setEmail('');
                 setMensagem('');
-                
+
                 // Navegação forçada após o alert (pequeno delay)
-                setTimeout(() => navigation.goBack(), 100); 
+                setTimeout(() => navigation.goBack(), 100);
 
             } else {
                 throw new Error("Falha de conexão. Tente novamente mais tarde.");
@@ -79,39 +79,41 @@ export default function ContatoScreen({ navigation }) {
             <Text style={styles.title}>Fale Conosco</Text>
             <Text style={styles.subtitle}>Envie-nos uma mensagem e entraremos em contato.</Text>
 
+            {/* Exibir mensagem de erro da API */}
             {error && <Text style={styles.apiErrorText}>Erro: {error}</Text>}
 
-            <TextInput
-                style={styles.input}
+            {/* Input Nome - AGORA USANDO CustomInput */}
+            <CustomInput
                 placeholder="Seu Nome Completo"
                 value={nome}
                 onChangeText={setNome}
                 editable={!isLoading}
             />
 
-            <TextInput
-                style={[styles.input, !isEmailValid && styles.inputError]}
+            {/* Input Email - AGORA USANDO CustomInput (com lógica de validação) */}
+            <CustomInput
                 placeholder="Seu Email"
                 value={email}
                 onChangeText={handleEmailChange}
                 keyboardType="email-address"
                 editable={!isLoading}
+                isInvalid={!isEmailValid} // Passa o status de erro
+                errorText="E-mail inválido." // Passa a mensagem de erro
             />
 
-            {!isEmailValid && (
-                <Text style={styles.errorText}>E-mail inválido.</Text>
-            )}
-
-            <TextInput
-                style={[styles.input, styles.textArea]}
+            {/* Input Mensagem (Área de Texto) - AGORA USANDO CustomInput */}
+            <CustomInput
                 placeholder="Sua Mensagem / Dúvida"
                 value={mensagem}
                 onChangeText={setMensagem}
                 multiline={true}
                 numberOfLines={4}
                 editable={!isLoading}
+                // Passa o estilo extra para a área de texto (textArea)
+                style={styles.textArea} 
             />
 
+            {/* Botão de Envio */}
             <View style={styles.buttonContainer}>
                 <Button
                     title={isLoading ? "" : "Enviar Feedback"}
@@ -124,6 +126,7 @@ export default function ContatoScreen({ navigation }) {
                 )}
             </View>
 
+            {/* Botão Voltar */}
             <View style={styles.buttonContainer}>
                 <Button
                     title="Voltar"
@@ -155,28 +158,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         color: '#666',
     },
-    input: {
-        width: '100%',
-        height: 50,
-        backgroundColor: '#fff',
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        marginBottom: 15,
-        fontSize: 16,
-    },
-    inputError: {
-        borderColor: 'red',
-        borderWidth: 2,
-    },
-    errorText: {
-        color: 'red',
-        marginBottom: 10,
-        alignSelf: 'flex-start',
-        marginLeft: '5%',
-    },
-    textArea: {
+    // Estilos de Input (REMOVIDOS: input, inputError, errorText, pois estão em CustomInput.js)
+    
+    // Apenas os estilos NÃO REUTILIZÁVEIS permanecem aqui:
+    textArea: { // Estilo específico para a área de texto
         height: 120,
         textAlignVertical: 'top',
         paddingTop: 10,
